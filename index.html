@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mom's Grocery List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .item.purchased span {
+            text-decoration: line-through;
+            color: green;
+        }
+        .buttons button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-section input, .add-section select {
+            padding: 10px;
+            margin: 5px;
+            width: calc(100% - 22px);
+        }
+        .add-section button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>🛒 Mom's Grocery List</header>
+    <div class="container">
+        <div class="add-section">
+            <input type="text" id="itemName" placeholder="Item Name">
+            <input type="text" id="itemQty" placeholder="Quantity">
+            <select id="itemCategory">
+                <option value="Vegetables">Vegetables 🥦</option>
+                <option value="Fruits">Fruits 🍎</option>
+                <option value="Dairy">Dairy 🥛</option>
+                <option value="Spices">Spices 🌶️</option>
+                <option value="Grains">Grains </option>
+                <option value="pulses">Pulses</option>
+                <option value="Oil"> oil</option>
+                <option value="Snacks">Snacks 🍿</option>
+                <option value="B">Bakery items</option>
+                <option value="Liquids">Liquids and Detergent </option>
+                <option value="Puja items">Puja items</option>
+                <option value="Dry fruits">Dry fruits</option>
+                <option value="Others">Miscellenious</option>
+            </select>
+            <button onclick="addItem()">Add Item</button>
+        </div>
+        <div id="groceryList"></div>
+    </div>
+
+    <script>
+        let groceryList = JSON.parse(localStorage.getItem('groceryList')) || [];
+
+        function saveList() {
+            localStorage.setItem('groceryList', JSON.stringify(groceryList));
+        }
+
+        function renderList() {
+            const listDiv = document.getElementById('groceryList');
+            listDiv.innerHTML = '';
+
+            groceryList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item' + (item.purchased ? ' purchased' : '');
+                div.innerHTML = `
+                    <span>${item.name} (${item.qty}) - ${item.category}</span>
+                    <div class="buttons">
+                        <button onclick="togglePurchased(${index})">✔️</button>
+                        <button onclick="deleteItem(${index})">🗑️</button>
+                    </div>
+                `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const qty = document.getElementById('itemQty').value;
+            const category = document.getElementById('itemCategory').value;
+
+            if (name && qty) {
+                groceryList.push({ name, qty, category, purchased: false });
+                saveList();
+                renderList();
+
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemQty').value = '';
+            }
+        }
+
+        function togglePurchased(index) {
+            groceryList[index].purchased = !groceryList[index].purchased;
+            saveList();
+            renderList();
+        }
+
+        function deleteItem(index) {
+            groceryList.splice(index, 1);
+            saveList();
+            renderList();
+        }
+
+        renderList();
+    </script>
+</body>
+</html>
